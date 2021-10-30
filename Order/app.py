@@ -3,6 +3,9 @@ import pymongo
 from flask import Flask,request,jsonify
 app = Flask(__name__)
 
+mongoURL = “mongodb://comp3122:12345@mongo:27017/“
+client = MongoClient(mongoURL)
+
 @app.route("/")	
 def main():
 	return "Welcome to Poly Eats!"
