@@ -1,0 +1,28 @@
+version: "3.3"
+
+services:
+  menu: 
+    image: menu
+    container_name: menu_container
+    build: ./Menu
+    ports:
+      - "5000:5000"
+
+  mongo:
+    image: mongo
+    container_name: db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: comp3122
+      MONGO_INITDB_ROOT_PASSWORD: 12345
+      MONGO_INITDB_DATABASE: admin
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - mongo_volume:/data/db
+
+networks:
+  default:
+    name: polyeats
+
+volumes:
+  mongo_volume:
+    name: polyeats_mongo_vol
