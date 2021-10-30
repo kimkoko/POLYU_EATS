@@ -7,6 +7,20 @@ services:
     build: ./Menu
     ports:
       - "5000:5000"
+      
+    order: 
+    image: order
+    container_name: order_container
+    build: ./Order
+    ports:
+      - "5001:5001"
+
+  store: 
+    image: store
+    container_name: store_container
+    build: ./Store
+    ports:
+      - "5002:5002"
 
   mongo:
     image: mongo
