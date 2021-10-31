@@ -2,29 +2,52 @@ version: "3.3"
 
 services:
   menu: 
+    build: ./Menu
     image: menu
     container_name: menu_container
-    build: ./Menu
     ports:
       - "5000:5000"
-      
-    order: 
+    depends_on:
+      mongodb
+
+  order: 
+    build: ./Order
     image: order
     container_name: order_container
-    build: ./Order
     ports:
       - "5001:5001"
+    depends_on:
+      mongodb
 
-  store: 
+  store:
+    build: ./Store   
     image: store
     container_name: store_container
-    build: ./Store
     ports:
       - "5002:5002"
+    depends_on:
+      mongodb
+  
+  nginx:
+    build: ./nginx_revproxy
+    image: nginx:latest
+    ports:
+      - "2000:80"
+    links:
+      - menu
+      - order
+      - store
+      - mongodb
+    ports:
+      - "80:80"
+    networks:
+      - polyeats
 
-  mongo:
+  mongodb:
     image: mongo
     container_name: db
+    ports:
+      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: comp3122
       MONGO_INITDB_ROOT_PASSWORD: 12345
