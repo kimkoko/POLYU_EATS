@@ -8,42 +8,9 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      mongodb
-
-  order: 
-    build: ./Order
-    image: order
-    container_name: order_container
-    ports:
-      - "5001:5001"
-    depends_on:
-      mongodb
-
-  store:
-    build: ./Store   
-    image: store
-    container_name: store_container
-    ports:
-      - "5002:5002"
-    depends_on:
-      mongodb
+      menu-mongodb
   
-  nginx:
-    build: ./nginx_revproxy
-    image: nginx:latest
-    ports:
-      - "2000:80"
-    links:
-      - menu
-      - order
-      - store
-      - mongodb
-    ports:
-      - "80:80"
-    networks:
-      - polyeats
-
-  mongodb:
+  menu-mongodb:
     image: mongo
     container_name: db
     ports:
@@ -55,6 +22,64 @@ services:
     volumes:
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - mongo_volume:/data/db
+
+  order: 
+    build: ./Order
+    image: order
+    container_name: order_container
+    ports:
+      - "5001:5001"
+    depends_on:
+      order-mongodb
+  
+  order-mongodb:
+    image: mongo
+    container_name: db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: comp3122
+      MONGO_INITDB_ROOT_PASSWORD: 12345
+      MONGO_INITDB_DATABASE: admin
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - mongo_volume:/data/db
+
+  store:
+    build: ./Store   
+    image: store
+    container_name: store_container
+    ports:
+      - "5002:5002"
+    depends_on:
+      store-mongodb
+
+  store-mongodb:
+    image: mongo
+    container_name: db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: comp3122
+      MONGO_INITDB_ROOT_PASSWORD: 12345
+      MONGO_INITDB_DATABASE: admin
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - mongo_volume:/data/db
+  
+  nginx:
+    build: ./nginx_revproxy
+    image: nginx:latest
+    ports:
+      - "2000:80"
+    links:
+      - menu
+      - order
+      - store
+    ports:
+      - "80:80"
+    networks:
+      - polyeats
 
 networks:
   default:
